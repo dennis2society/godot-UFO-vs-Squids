@@ -52,6 +52,7 @@ var _flash := 0.0
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	add_to_group("player")
 	Progress.skills_changed.connect(_apply_skills)
 	_apply_skills()
 

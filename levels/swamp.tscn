@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://pickups/shield_pickup.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://enemies/zombie_head.tscn" id="8"]
 [ext_resource type="Shader" path="res://levels/swamp.gdshader" id="9"]
+[ext_resource type="PackedScene" path="res://pickups/crystal.tscn" id="c1"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_material"]
 sky_top_color = Color(0.13, 0.15, 0.2, 1)
@@ -76,6 +77,7 @@ zombie_scene = ExtResource("8")
 health_pack_scene = ExtResource("4")
 skill_point_scene = ExtResource("6")
 shield_scene = ExtResource("7")
+crystal_scene = ExtResource("c1")
 terrain = NodePath("../Terrain")
 player = NodePath("../Ufo")
 hud = NodePath("../Hud")

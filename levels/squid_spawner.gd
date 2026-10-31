@@ -8,6 +8,7 @@ extends Node3D
 @export var blinker_scene: PackedScene ## Leave empty for no teleporting rares.
 @export var health_pack_scene: PackedScene
 @export var skill_point_scene: PackedScene
+@export var crystal_scene: PackedScene
 @export var shield_scene: PackedScene
 @export var terrain: Node3D
 @export var player: Node3D
@@ -46,6 +47,10 @@ extends Node3D
 @export_group("Drops")
 @export_range(0.0, 1.0) var drop_chance := 0.1 ## Health pack chance per kill.
 @export_range(0.0, 1.0) var shield_drop_chance := 0.06 ## Per kill, once a rank is bought.
+
+@export_range(0.0, 1.0) var crystal_chance := 0.2 ## Per kill.
+@export var rare_crystals := 6 ## Burst from a rare target.
+@export var max_crystals := 50 ## On the map at once, so a long run stays smooth.
 
 @export_group("Squid fire")
 @export var squids_shoot := false ## Off for early levels, where contact is the only danger.
@@ -248,6 +253,7 @@ func _reward_rare_kill(at: Vector3) -> void:
 	kills += 1
 	_update_objective()
 	_drop(skill_point_scene.instantiate(), at)
+	_drop_crystals(at, rare_crystals)
 
 
 func _on_squid_died(at: Vector3) -> void:
@@ -255,6 +261,8 @@ func _on_squid_died(at: Vector3) -> void:
 	kills += 1
 	_update_objective()
 
+	if randf() < crystal_chance:
+		_drop_crystals(at, 1)
 	if _shield_gem_due():
 		_drop(shield_scene.instantiate(), at)
 	elif randf() < drop_chance:
@@ -269,6 +277,15 @@ func _shield_gem_due() -> bool:
 		if child.has_method("is_shield_pickup"):
 			return false
 	return randf() < shield_drop_chance + Progress.value("beacon")
+
+
+func _drop_crystals(at: Vector3, amount: int) -> void:
+	for i in amount:
+		if get_tree().get_node_count_in_group("crystals") + _queued_drops.size() >= max_crystals:
+			return
+		var crystal := crystal_scene.instantiate()
+		crystal.terrain = terrain
+		_drop(crystal, at)
 
 
 func _drop(pickup: Node3D, at: Vector3) -> void:

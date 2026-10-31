@@ -1,12 +1,13 @@
 extends Control
 ## The whole map from above, north up: the player in blue with a heading tick, enemies
-## in red and rare enemies in yellow.
+## in red, rare enemies in yellow and crystals in cyan.
 
 @export var background := Color(0.0, 0.0, 0.0, 0.5)
 @export var border := Color(1.0, 1.0, 1.0, 0.5)
 @export var player_color := Color(0.3, 0.6, 1.0)
 @export var enemy_color := Color(0.95, 0.2, 0.15)
 @export var rare_color := Color(1.0, 0.85, 0.15)
+@export var crystal_color := Color(0.3, 0.95, 0.9)
 @export var dot_radius := 2.0
 @export var rare_radius := 3.5
 @export var player_radius := 3.5
@@ -26,6 +27,8 @@ func _draw() -> void:
 	if player == null:
 		return
 
+	for crystal: Node3D in get_tree().get_nodes_in_group("crystals"):
+		draw_circle(_to_map(crystal.global_position), 1.5, crystal_color)
 	for enemy: Node3D in get_tree().get_nodes_in_group("enemies"):
 		if enemy.bonus:
 			continue

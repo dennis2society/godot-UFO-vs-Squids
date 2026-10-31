@@ -12,6 +12,7 @@ const BRANCH_COLORS := {
 @export var empty_color := Color(0.9, 0.15, 0.1)
 @export var edge_margin := 40.0
 @export var skill_point_color := Color(1.0, 0.82, 0.2)
+@export var crystal_color := Color(0.3, 0.95, 0.9)
 
 var _waypoint: Variant = null
 var _waypoint_text := ""
@@ -35,6 +36,7 @@ func _ready() -> void:
 	player.weapon.plasma_not_ready.connect(_on_plasma_not_ready)
 	Progress.skills_changed.connect(_on_skills_changed)
 	Progress.point_gained.connect(_on_point_gained)
+	Progress.crystals_changed.connect(_refresh_upgrades)
 	$Crosshair.weapon = player.weapon
 	Settings.hints_changed.connect(hint.set_visible)
 	hint.visible = Settings.hints
@@ -131,6 +133,7 @@ func _refresh_upgrades() -> void:
 		lines.append("[color=#%s]★ Skill points %d  (T)[/color]" % [
 			skill_point_color.to_html(false), Progress.points
 		])
+	lines.append("[color=#%s]◆ Crystals %d[/color]" % [crystal_color.to_html(false), Progress.crystals])
 	for branch: String in BRANCH_COLORS:
 		var held := Progress.branch_ranks(branch)
 		if held > 0:

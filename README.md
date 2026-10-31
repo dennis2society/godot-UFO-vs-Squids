@@ -23,7 +23,7 @@ A third-person arcade shooter made with [Godot 4.7](https://godotengine.org). Pi
 
 ## Progression
 
-Destroy rare enemies to earn skill points, then spend them in the skill tree. All upgrades come from the tree. A medal unlocks the next mission.
+Destroy rare enemies to earn skill points and collect the crystals enemies drop, then spend both in the skill tree. All upgrades come from the tree. A medal unlocks the next mission.
 
 ## Controls
 

@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://enemies/boss.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://pickups/health_pack.tscn" id="6"]
 [ext_resource type="PackedScene" path="res://pickups/shield_pickup.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://pickups/crystal.tscn" id="c1"]
 
 [node name="Arena" instance=ExtResource("1")]
 
@@ -33,6 +34,7 @@ script = ExtResource("4")
 boss_scene = ExtResource("5")
 health_pack_scene = ExtResource("6")
 shield_scene = ExtResource("7")
+crystal_scene = ExtResource("c1")
 terrain = NodePath("../Terrain")
 walls = NodePath("../Walls")
 player = NodePath("../Ufo")

@@ -5,6 +5,7 @@ extends Node
 
 signal skills_changed
 signal point_gained
+signal crystals_changed
 
 const SAVE_PATH := "user://save.cfg"
 const FIRST_LEVEL := "res://levels/tutorial.tscn"
@@ -17,6 +18,7 @@ const LEVEL_NAMES := {
 	"res://levels/swamp.tscn": "Mission 5",
 }
 const COST_STEP := 3 ## Every this many ranks, the next rank costs one point more.
+const CRYSTALS_PER_POINT := 8 ## A rank's crystal price, per skill point it costs.
 const MEDAL_POINTS: Array[int] = [1, 2, 3] ## By index into Rewards.MEDALS.
 const THREAT_TIER_RANKS := 8 ## Skill ranks in one step of the threat curve.
 const THREAT_TIER_CALM := 5 ## Ranks at the start of each step that add no threat.
@@ -144,6 +146,7 @@ const SYNERGIES := {
 var run := _new_run() ## The level last played, or the next one once a level is won.
 var furthest := "" ## The latest level reached, which replaying earlier ones keeps.
 var points := 0
+var crystals := 0
 var rewarded_medals := {} ## Mission name to the best medal that has paid out.
 var ranks := {}
 
@@ -172,6 +175,7 @@ func _load() -> void:
 	run = file.get_value("save", "run", run)
 	furthest = file.get_value("save", "furthest", run.level)
 	points = file.get_value("save", "points", 0)
+	crystals = file.get_value("save", "crystals", 0)
 	rewarded_medals = file.get_value("save", "rewarded_medals", {})
 	ranks = file.get_value("save", "ranks", {})
 
@@ -194,6 +198,7 @@ func new_game() -> void:
 	run = _new_run()
 	furthest = ""
 	points = 0
+	crystals = 0
 	rewarded_medals = {}
 	ranks = {}
 	_banked = {}
@@ -210,6 +215,7 @@ func leave_level() -> void:
 		run = _new_run()
 		furthest = ""
 		points = 0
+		crystals = 0
 		rewarded_medals = {}
 		ranks = {}
 		_banked = {}
@@ -225,6 +231,7 @@ func demo_start() -> void:
 	run = _new_run()
 	run.level = DEMO_LEVEL
 	points = 0
+	crystals = 0
 	ranks = DEMO_RANKS.duplicate()
 
 
@@ -234,6 +241,7 @@ func debug_start(level: String, use_powerups: bool) -> void:
 	if not use_powerups:
 		run = _new_run()
 		points = 0
+		crystals = 0
 		ranks = {}
 	run.level = level
 
@@ -306,19 +314,32 @@ func unlocked(skill: String) -> bool:
 	return requirements_met(SKILLS[skill].get("requires", {}))
 
 
-## What the next rank costs.
+## Crystals are the only thing that makes the player fly down to the ground.
+func add_crystals(amount: int) -> void:
+	crystals += amount
+	_save()
+	crystals_changed.emit()
+
+
+## Skill points the next rank costs.
 func cost(skill: String) -> int:
 	return SKILLS[skill].get("cost", 1) + rank(skill) / COST_STEP
 
 
+## Crystals the next rank costs.
+func crystal_cost(skill: String) -> int:
+	return cost(skill) * CRYSTALS_PER_POINT
+
+
 func can_buy(skill: String) -> bool:
-	return points >= cost(skill) and rank(skill) < SKILLS[skill].max and unlocked(skill)
+	return points >= cost(skill) and crystals >= crystal_cost(skill) and rank(skill) < SKILLS[skill].max and unlocked(skill)
 
 
 func buy(skill: String) -> void:
 	if not can_buy(skill):
 		return
 	points -= cost(skill)
+	crystals -= crystal_cost(skill)
 	ranks[skill] = rank(skill) + 1
 	_save()
 	skills_changed.emit()
@@ -363,6 +384,7 @@ func _save() -> void:
 	file.set_value("save", "run", _banked if _banked else run)
 	file.set_value("save", "furthest", furthest)
 	file.set_value("save", "points", points)
+	file.set_value("save", "crystals", crystals)
 	file.set_value("save", "rewarded_medals", rewarded_medals)
 	file.set_value("save", "ranks", ranks)
 	file.save(SAVE_PATH)

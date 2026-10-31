@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://pickups/health_pack.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://pickups/skill_point.tscn" id="6"]
 [ext_resource type="PackedScene" path="res://pickups/shield_pickup.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://pickups/crystal.tscn" id="c1"]
 
 [node name="Main" instance=ExtResource("1")]
 
@@ -21,6 +22,7 @@ squid_scene = ExtResource("3")
 health_pack_scene = ExtResource("4")
 skill_point_scene = ExtResource("6")
 shield_scene = ExtResource("7")
+crystal_scene = ExtResource("c1")
 terrain = NodePath("../Terrain")
 player = NodePath("../Ufo")
 hud = NodePath("../Hud")

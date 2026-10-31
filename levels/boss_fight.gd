@@ -5,6 +5,7 @@ extends Node3D
 @export var boss_scene: PackedScene
 @export var health_pack_scene: PackedScene
 @export var shield_scene: PackedScene
+@export var crystal_scene: PackedScene
 @export var terrain: Node3D
 @export var walls: Node3D
 @export var player: Node3D
@@ -19,6 +20,7 @@ extends Node3D
 @export var boss_health_per_threat := 120.0
 @export var boss_skill_points := 3
 @export var supply_interval := 22.0
+@export var supply_crystals := 4 ## With each delivery, as the arena has no squids.
 @export var silver_time := 300.0 ## Seconds to the kill. Any kill earns at least bronze.
 @export var gold_time := 180.0
 
@@ -81,11 +83,16 @@ func _deliver_supplies() -> void:
 	var wants_shield: bool = Progress.rank("shield") > 0 and player.shield < player.max_shield
 	var scene := shield_scene if wants_shield else health_pack_scene
 	for child in get_children():
-		if child is Area3D and child != _boss:
+		if child is Area3D and child != _boss and not child.is_in_group("crystals"):
 			child.queue_free() # Only the latest delivery stays on the map.
 	var pickup: Node3D = scene.instantiate()
 	pickup.position = spots[_supply_spot]
 	add_child(pickup)
+	for i in supply_crystals:
+		var crystal := crystal_scene.instantiate()
+		crystal.terrain = terrain
+		crystal.position = spots[_supply_spot] + Vector3.UP * 6.0
+		add_child(crystal)
 
 
 func _on_boss_died(_at: Vector3) -> void:

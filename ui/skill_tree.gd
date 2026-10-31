@@ -29,6 +29,7 @@ func _ready() -> void:
 		_buttons[skill] = _add_skill_button(skill, columns[branch])
 	back_button.pressed.connect(closed.emit)
 	Progress.skills_changed.connect(_refresh)
+	Progress.crystals_changed.connect(_refresh)
 	_refresh()
 
 
@@ -61,7 +62,7 @@ func _add_skill_button(skill: String, column: VBoxContainer) -> Button:
 
 
 func _refresh() -> void:
-	points_label.text = "Skill points: %d" % Progress.points
+	points_label.text = "Skill points: %d     Crystals: %d" % [Progress.points, Progress.crystals]
 	for skill: String in _buttons:
 		_refresh_button(skill)
 	if _shown_skill != "":
@@ -83,7 +84,9 @@ func _refresh_button(skill: String) -> void:
 	var button: Button = _buttons[skill]
 	var entry: Dictionary = Progress.SKILLS[skill]
 	var maxed: bool = Progress.rank(skill) >= entry.max
-	var status := "MAX" if maxed else "Cost %d" % Progress.cost(skill)
+	var status := "MAX"
+	if not maxed:
+		status = "Cost %d  ◆ %d" % [Progress.cost(skill), Progress.crystal_cost(skill)]
 	if not Progress.unlocked(skill):
 		status = "Needs %s" % _needs_text(_unmet(entry.requires), 1)
 	button.text = "%s  %d/%d\n%s" % [entry.name, Progress.rank(skill), entry.max, status]
