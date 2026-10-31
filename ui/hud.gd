@@ -19,6 +19,7 @@ var _waypoint_text := ""
 @onready var life_bar: ProgressBar = $LifeBar
 @onready var shield_bar: ProgressBar = $ShieldBar
 @onready var boss_bar: ProgressBar = $BossBar
+@onready var mission_name: Label = $MissionName
 @onready var objective: Label = $Objective
 @onready var hint: Label = $Hint
 @onready var toast: Label = $Toast
@@ -37,6 +38,7 @@ func _ready() -> void:
 	$Crosshair.weapon = player.weapon
 	Settings.hints_changed.connect(hint.set_visible)
 	hint.visible = Settings.hints
+	mission_name.text = Progress.LEVEL_NAMES.get(get_tree().current_scene.scene_file_path, "")
 	$Minimap.player = player
 	$Compass.player = player
 	_on_skills_changed()

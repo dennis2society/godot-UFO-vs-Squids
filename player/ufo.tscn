@@ -132,30 +132,36 @@ cast_shadow = 0
 mesh = SubResource("shield_mesh")
 
 [node name="EngineSound" type="AudioStreamPlayer" parent="."]
+bus = &"SFX"
 stream = ExtResource("3")
 autoplay = true
 
 [node name="FireSound" type="AudioStreamPlayer" parent="."]
+bus = &"SFX"
 stream = ExtResource("4")
 volume_db = -9.0
 max_polyphony = 4
 
 [node name="HitSound" type="AudioStreamPlayer" parent="."]
 process_mode = 3
+bus = &"SFX"
 stream = ExtResource("5")
 volume_db = -2.0
 max_polyphony = 3
 
 [node name="RocketSound" type="AudioStreamPlayer" parent="."]
+bus = &"SFX"
 stream = ExtResource("8")
 volume_db = -6.0
 
 [node name="PickupSound" type="AudioStreamPlayer" parent="."]
 process_mode = 3
+bus = &"SFX"
 stream = ExtResource("9")
 volume_db = -6.0
 max_polyphony = 2
 
 [node name="ChargedSound" type="AudioStreamPlayer" parent="."]
+bus = &"SFX"
 stream = ExtResource("10")
 volume_db = -5.0

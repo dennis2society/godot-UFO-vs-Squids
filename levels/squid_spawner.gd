@@ -15,6 +15,7 @@ extends Node3D
 @export var menu: CanvasLayer
 @export var mission_name := "Mission 2"
 @export_file("*.tscn") var next_level := "" ## Offered once a medal is earned.
+@export var final_mission := false ## Gold here wins the game.
 @export var spawn_range := 110.0
 @export var min_hover := 6.0
 @export var max_hover := 50.0
@@ -282,6 +283,7 @@ func _add_queued_drop(pickup: Node3D) -> void:
 	add_child(pickup)
 
 
+## Medals come in order during a run, so each pays as it is reached.
 ## Index into Rewards.MEDALS, or -1 for none yet.
 func _medal() -> int:
 	if survived >= gold_time:
@@ -293,10 +295,11 @@ func _medal() -> int:
 
 func _on_medal_reached(medal: int) -> void:
 	var earned: Dictionary = Rewards.MEDALS[medal]
+	var points := Rewards.points_text(Progress.reward_medal(mission_name, medal))
 	if medal == 2:
-		_finish()
+		_finish(points)
 	else:
-		hud.show_toast("%s medal earned" % earned.name, Color(earned.color))
+		hud.show_toast(("%s medal earned  %s" % [earned.name, points]).strip_edges(), Color(earned.color))
 
 
 func _on_player_destroyed() -> void:
@@ -304,7 +307,7 @@ func _on_player_destroyed() -> void:
 
 
 ## Records the run and ends the mission, by dying or by reaching gold.
-func _finish() -> void:
+func _finish(points := "") -> void:
 	set_process(false)
 	var clock := Rewards.format_clock(survived)
 	var medal := _medal()
@@ -313,7 +316,11 @@ func _finish() -> void:
 		return
 	var earned: Dictionary = Rewards.MEDALS[medal]
 	Rewards.award(mission_name, medal, survived, true)
-	menu.show_result("%s Medal\nSurvived %s" % [earned.name, clock], next_level, Color(earned.color))
+	if medal == 2 and final_mission:
+		menu.show_win(("The squids are beaten after %s\n%s" % [clock, points]).strip_edges())
+		return
+	var heading := "%s Medal\nSurvived %s\n%s" % [earned.name, clock, points]
+	menu.show_result(heading.strip_edges(), next_level, Color(earned.color))
 
 
 func _update_objective() -> void:

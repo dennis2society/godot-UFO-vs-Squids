@@ -142,6 +142,7 @@ initial_velocity_max = 8.0
 
 [node name="ExplosionSound" type="AudioStreamPlayer3D" parent="."]
 process_mode = 3
+bus = &"SFX"
 stream = ExtResource("2")
 unit_size = 40.0
 max_distance = 400.0

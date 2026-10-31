@@ -95,7 +95,9 @@ func _pass_ring() -> void:
 		var medal := _medal_for(_time)
 		Rewards.award("Mission 1", medal, _time)
 		var earned: Dictionary = Rewards.MEDALS[medal]
-		menu.show_result("%s Medal\n%.2f s" % [earned.name, _time], next_level, Color(earned.color))
+		var heading := "%s Medal\n%.2f s" % [earned.name, _time]
+		heading += "\n" + Rewards.points_text(Progress.reward_medal("Mission 1", medal))
+		menu.show_result(heading.strip_edges(), next_level, Color(earned.color))
 	else:
 		_rings[_current].set_active(true)
 

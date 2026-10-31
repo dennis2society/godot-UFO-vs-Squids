@@ -9,6 +9,7 @@ extends CanvasLayer
 var _next_scene := ""
 var _finished := false
 var _leaving := false
+var _won := false
 var _tree_from_game := false ## Leaving the tree resumes play instead of showing the menu.
 
 @onready var center: Control = $Center
@@ -21,6 +22,10 @@ var _tree_from_game := false ## Leaving the tree resumes play instead of showing
 @onready var restart_button: Button = $Center/Items/Restart
 @onready var stats_toggle: CheckButton = $Center/Items/StatsToggle
 @onready var music_toggle: CheckButton = $Center/Items/MusicToggle
+@onready var music_volume: Control = $Center/Items/MusicVolume
+@onready var sfx_volume: Control = $Center/Items/SfxVolume
+@onready var music_slider: HSlider = $Center/Items/MusicVolume/Slider
+@onready var sfx_slider: HSlider = $Center/Items/SfxVolume/Slider
 @onready var hints_toggle: CheckButton = $Center/Items/HintsToggle
 @onready var main_menu_button: Button = $Center/Items/MainMenu
 @onready var quit_button: Button = $Center/Items/Quit
@@ -39,6 +44,11 @@ func _ready() -> void:
 	quit_button.pressed.connect(get_tree().quit)
 	music_toggle.button_pressed = Settings.music
 	music_toggle.toggled.connect(Music.set_enabled)
+	music_slider.value = Settings.music_volume
+	music_slider.value_changed.connect(Settings.set_music_volume)
+	sfx_slider.value = Settings.sfx_volume
+	sfx_slider.value_changed.connect(Settings.set_sfx_volume)
+	sfx_slider.drag_ended.connect(_preview_effects)
 	hints_toggle.button_pressed = Settings.hints
 	hints_toggle.toggled.connect(Settings.set_hints)
 	stats_toggle.button_pressed = stats.enabled
@@ -70,7 +80,7 @@ func _start_demo() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if Progress.demo:
+	if Progress.demo or _won:
 		return
 	if skill_tree.visible:
 		if event.is_action_pressed("ui_cancel") or event.is_action_pressed("skill_tree"):
@@ -95,9 +105,20 @@ func show_result(heading: String, next_scene := "", color := Color.WHITE) -> voi
 	if next_scene != "":
 		Progress.complete_level(next_scene)
 	title.modulate = color
+	get_parent().get_node("Hud").toast.hide() # It would sit on top of the title.
 	if Progress.demo:
 		get_tree().create_timer(demo_end_delay).timeout.connect(_main_menu)
 	_open(heading)
+
+
+## The end of the game. The only way on is back to the main menu.
+func show_win(details: String) -> void:
+	_won = true
+	show_result("You Win!", "", Color(Rewards.MEDALS[2].color))
+	rewards.text = "[center]%s\n\n%s[/center]" % [details, Rewards.summary()]
+	for button: Control in [restart_button, skill_tree_button, quit_button]:
+		button.hide()
+	main_menu_button.grab_focus()
 
 
 func _open(heading: String) -> void:
@@ -107,6 +128,8 @@ func _open(heading: String) -> void:
 	resume_button.visible = not _finished
 	stats_toggle.visible = not _finished
 	music_toggle.visible = not _finished
+	music_volume.visible = not _finished
+	sfx_volume.visible = not _finished
 	hints_toggle.visible = not _finished
 	continue_button.visible = _next_scene != ""
 	restart_button.visible = true
@@ -117,6 +140,11 @@ func _open(heading: String) -> void:
 		if button.visible:
 			button.grab_focus()
 			break
+
+
+## Effects are silent while paused, so this lets the slider be heard.
+func _preview_effects(_changed: bool) -> void:
+	player.pickup_sound.play()
 
 
 func _open_skill_tree() -> void:

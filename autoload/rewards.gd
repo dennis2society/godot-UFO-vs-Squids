@@ -23,6 +23,13 @@ func award(mission: String, medal: int, time: float, longest_wins := false) -> v
 		_best[mission] = {"medal": medal, "time": time}
 
 
+## "+2 skill points", or nothing when no points were gained.
+func points_text(gained: int) -> String:
+	if gained <= 0:
+		return ""
+	return "+%d skill point%s" % [gained, "s" if gained > 1 else ""]
+
+
 ## Seconds as "m:ss" from a minute up, otherwise with hundredths for close races.
 func format_time(time: float) -> String:
 	return "%.2f s" % time if time < 60.0 else format_clock(time)

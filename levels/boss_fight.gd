@@ -97,8 +97,9 @@ func _on_boss_died(_at: Vector3) -> void:
 	var medal := 2 if _time <= gold_time else 1 if _time <= silver_time else 0
 	var earned: Dictionary = Rewards.MEDALS[medal]
 	Rewards.award(mission_name, medal, _time)
-	menu.show_result("%s Medal\nOvermind destroyed in %s" % [earned.name, Rewards.format_clock(_time)],
-			next_level, Color(earned.color))
+	var heading := "%s Medal\nOvermind destroyed in %s" % [earned.name, Rewards.format_clock(_time)]
+	heading += "\n" + Rewards.points_text(Progress.reward_medal(mission_name, medal))
+	menu.show_result(heading.strip_edges(), next_level, Color(earned.color))
 
 
 func _update_objective() -> void:

@@ -17,6 +17,7 @@ const LEVEL_NAMES := {
 	"res://levels/swamp.tscn": "Mission 5",
 }
 const COST_STEP := 3 ## Every this many ranks, the next rank costs one point more.
+const MEDAL_POINTS: Array[int] = [1, 2, 3] ## By index into Rewards.MEDALS.
 const THREAT_TIER_RANKS := 8 ## Skill ranks in one step of the threat curve.
 const THREAT_TIER_CALM := 5 ## Ranks at the start of each step that add no threat.
 const THREAT_TIER_RISE := 2 ## Threat added over the rest of the step.
@@ -140,8 +141,10 @@ const SYNERGIES := {
 	},
 }
 
-var run := _new_run() ## The level being played, as it stood on arrival.
+var run := _new_run() ## The level last played, or the next one once a level is won.
+var furthest := "" ## The latest level reached, which replaying earlier ones keeps.
 var points := 0
+var rewarded_medals := {} ## Mission name to the best medal that has paid out.
 var ranks := {}
 
 const DEMO_LEVEL := "res://levels/mountains.tscn"
@@ -167,7 +170,9 @@ func _load() -> void:
 	if file.load(SAVE_PATH) != OK:
 		return
 	run = file.get_value("save", "run", run)
+	furthest = file.get_value("save", "furthest", run.level)
 	points = file.get_value("save", "points", 0)
+	rewarded_medals = file.get_value("save", "rewarded_medals", {})
 	ranks = file.get_value("save", "ranks", {})
 
 
@@ -179,9 +184,17 @@ func level_name() -> String:
 	return LEVEL_NAMES.get(run.level, "last level")
 
 
+## Every level up to the furthest reached, in mission order.
+func reached_levels() -> Array:
+	var levels: Array = LEVEL_NAMES.keys()
+	return levels.slice(0, levels.find(furthest) + 1)
+
+
 func new_game() -> void:
 	run = _new_run()
+	furthest = ""
 	points = 0
+	rewarded_medals = {}
 	ranks = {}
 	_banked = {}
 	debug_session = false
@@ -195,7 +208,9 @@ func leave_level() -> void:
 		debug_session = false
 		demo = false
 		run = _new_run()
+		furthest = ""
 		points = 0
+		rewarded_medals = {}
 		ranks = {}
 		_banked = {}
 		_load()
@@ -227,12 +242,14 @@ func debug_start(level: String, use_powerups: bool) -> void:
 func enter_level(scene: String) -> void:
 	run.level = scene
 	_banked = {}
+	_reach(scene)
 	_save()
 
 
 ## Banks a won level straight away, so quitting from the result screen keeps it.
 func complete_level(next_level: String) -> void:
 	_banked = {"level": next_level}
+	_reach(next_level)
 	_save()
 
 
@@ -256,6 +273,18 @@ func add_point() -> void:
 	_save()
 	point_gained.emit()
 	skills_changed.emit()
+
+
+## Pays for a medal better than any this mission has paid for, so nothing can be farmed.
+## A medal skipped on the way up is forfeited. Returns the points gained.
+func reward_medal(mission: String, medal: int) -> int:
+	if medal <= rewarded_medals.get(mission, -1):
+		return 0
+	rewarded_medals[mission] = medal
+	var amount: int = MEDAL_POINTS[medal]
+	for i in amount:
+		add_point()
+	return amount
 
 
 func rank(skill: String) -> int:
@@ -315,6 +344,14 @@ func branch_ranks(branch: String) -> int:
 	return total
 
 
+func _reach(level: String) -> void:
+	var levels: Array = LEVEL_NAMES.keys()
+	if debug_session:
+		return
+	if levels.find(level) > levels.find(furthest):
+		furthest = level
+
+
 func _new_run() -> Dictionary:
 	return {"level": ""}
 
@@ -324,6 +361,8 @@ func _save() -> void:
 		return
 	var file := ConfigFile.new()
 	file.set_value("save", "run", _banked if _banked else run)
+	file.set_value("save", "furthest", furthest)
 	file.set_value("save", "points", points)
+	file.set_value("save", "rewarded_medals", rewarded_medals)
 	file.set_value("save", "ranks", ranks)
 	file.save(SAVE_PATH)

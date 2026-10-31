@@ -22,6 +22,7 @@ cast_shadow = 0
 mesh = SubResource("mesh")
 
 [node name="Sound" type="AudioStreamPlayer3D" parent="."]
+bus = &"SFX"
 stream = ExtResource("2")
 volume_db = -10.0
 pitch_scale = 0.6

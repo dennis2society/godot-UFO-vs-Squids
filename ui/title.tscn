@@ -90,10 +90,35 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Watch Demo"
 
+[node name="VsyncToggle" type="CheckButton" parent="Center/Items"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "VSync"
+
 [node name="Quit" type="Button" parent="Center/Items"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Quit"
+
+[node name="Chooser" type="VBoxContainer" parent="Center/Items"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Heading" type="Label" parent="Center/Items/Chooser"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Select a mission"
+horizontal_alignment = 1
+
+[node name="Missions" type="VBoxContainer" parent="Center/Items/Chooser"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Back" type="Button" parent="Center/Items/Chooser"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Back"
 
 [node name="Debug" type="VBoxContainer" parent="Center/Items"]
 layout_mode = 2

@@ -10,6 +10,7 @@ func _ready() -> void:
 	var track: AudioStreamOggVorbis = TRACK
 	track.loop = true
 	stream = track
+	bus = &"Music"
 	volume_db = VOLUME_DB
 
 
