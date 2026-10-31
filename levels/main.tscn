@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://levels/world.tscn" id="1"]
+[ext_resource type="Script" path="res://levels/squid_spawner.gd" id="2"]
+[ext_resource type="PackedScene" path="res://enemies/squid.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://pickups/health_pack.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://pickups/skill_point.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://pickups/shield_pickup.tscn" id="7"]
+
+[node name="Main" instance=ExtResource("1")]
+
+[node name="Terrain" parent="."]
+cells = 384
+
+[node name="Ufo" parent="."]
+bounds = 186.0
+
+[node name="Squids" type="Node3D" parent="." node_paths=PackedStringArray("terrain", "player", "hud", "menu")]
+script = ExtResource("2")
+squid_scene = ExtResource("3")
+health_pack_scene = ExtResource("4")
+skill_point_scene = ExtResource("6")
+shield_scene = ExtResource("7")
+terrain = NodePath("../Terrain")
+player = NodePath("../Ufo")
+hud = NodePath("../Hud")
+menu = NodePath("../Menu")
+next_level = "res://levels/mountains.tscn"
+spawn_range = 165.0

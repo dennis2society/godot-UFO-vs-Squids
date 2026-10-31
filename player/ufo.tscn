@@ -1,0 +1,161 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://player/ufo.gd" id="1"]
+[ext_resource type="Script" path="res://weapons/weapon.gd" id="2"]
+[ext_resource type="PackedScene" path="res://weapons/bolt.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://weapons/rocket.tscn" id="7"]
+[ext_resource type="AudioStream" path="res://sounds/rocket.wav" id="8"]
+[ext_resource type="AudioStream" path="res://sounds/pickup.wav" id="9"]
+[ext_resource type="AudioStream" path="res://sounds/charged.wav" id="10"]
+[ext_resource type="PackedScene" path="res://weapons/plasma_ball.tscn" id="11"]
+[ext_resource type="AudioStream" path="res://sounds/engine.wav" id="3"]
+[ext_resource type="AudioStream" path="res://sounds/laser.wav" id="4"]
+[ext_resource type="AudioStream" path="res://sounds/hit.wav" id="5"]
+[ext_resource type="Shader" path="res://player/shield.gdshader" id="12"]
+[ext_resource type="PackedScene" path="res://weapons/explosion.tscn" id="13"]
+
+[sub_resource type="Gradient" id="orb_gradient"]
+offsets = PackedFloat32Array(0, 0.35, 1)
+colors = PackedColorArray(0.8, 1, 1, 1, 0.1, 0.55, 1, 0.8, 0.05, 0.25, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="orb_texture"]
+gradient = SubResource("orb_gradient")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="orb_material"]
+transparency = 1
+shading_mode = 0
+albedo_texture = SubResource("orb_texture")
+billboard_mode = 1
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="orb_mesh"]
+material = SubResource("orb_material")
+
+[sub_resource type="CylinderShape3D" id="shape"]
+height = 1.2
+radius = 1.0
+
+[sub_resource type="SphereMesh" id="bottom_mesh"]
+radius = 1.0
+height = 0.45
+is_hemisphere = true
+radial_segments = 48
+rings = 12
+
+[sub_resource type="StandardMaterial3D" id="red"]
+albedo_color = Color(0.8, 0.05, 0.04, 1)
+metallic = 0.4
+roughness = 0.35
+
+[sub_resource type="SphereMesh" id="top_mesh"]
+radius = 1.0
+height = 0.22
+is_hemisphere = true
+radial_segments = 48
+rings = 12
+
+[sub_resource type="StandardMaterial3D" id="metal"]
+albedo_color = Color(0.55, 0.57, 0.6, 1)
+metallic = 0.9
+roughness = 0.3
+
+[sub_resource type="SphereMesh" id="canopy_mesh"]
+radius = 0.5
+height = 0.5
+is_hemisphere = true
+radial_segments = 32
+rings = 12
+
+[sub_resource type="StandardMaterial3D" id="glass"]
+transparency = 1
+albedo_color = Color(0.65, 0.9, 1, 0.3)
+roughness = 0.05
+metallic_specular = 0.9
+
+[sub_resource type="SphereMesh" id="shield_mesh"]
+radius = 1.7
+height = 3.4
+radial_segments = 48
+rings = 24
+
+[sub_resource type="ShaderMaterial" id="shield_material"]
+render_priority = 1
+shader = ExtResource("12")
+
+[node name="Ufo" type="CharacterBody3D"]
+motion_mode = 1
+script = ExtResource("1")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+shape = SubResource("shape")
+
+[node name="Hull" type="Node3D" parent="."]
+
+[node name="Bottom" type="MeshInstance3D" parent="Hull"]
+transform = Transform3D(1, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0)
+mesh = SubResource("bottom_mesh")
+surface_material_override/0 = SubResource("red")
+
+[node name="Top" type="MeshInstance3D" parent="Hull"]
+mesh = SubResource("top_mesh")
+surface_material_override/0 = SubResource("metal")
+
+[node name="Canopy" type="MeshInstance3D" parent="Hull"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, 0)
+mesh = SubResource("canopy_mesh")
+surface_material_override/0 = SubResource("glass")
+
+[node name="Weapon" type="Node3D" parent="Hull" node_paths=PackedStringArray("ship")]
+script = ExtResource("2")
+ship = NodePath("../..")
+bolt_scene = ExtResource("6")
+rocket_scene = ExtResource("7")
+plasma_scene = ExtResource("11")
+nova_scene = ExtResource("13")
+
+[node name="ChargeOrb" type="MeshInstance3D" parent="Hull"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -3)
+visible = false
+cast_shadow = 0
+mesh = SubResource("orb_mesh")
+
+[node name="Shield" type="MeshInstance3D" parent="."]
+visible = false
+material_override = SubResource("shield_material")
+cast_shadow = 0
+mesh = SubResource("shield_mesh")
+
+[node name="EngineSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3")
+autoplay = true
+
+[node name="FireSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4")
+volume_db = -9.0
+max_polyphony = 4
+
+[node name="HitSound" type="AudioStreamPlayer" parent="."]
+process_mode = 3
+stream = ExtResource("5")
+volume_db = -2.0
+max_polyphony = 3
+
+[node name="RocketSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8")
+volume_db = -6.0
+
+[node name="PickupSound" type="AudioStreamPlayer" parent="."]
+process_mode = 3
+stream = ExtResource("9")
+volume_db = -6.0
+max_polyphony = 2
+
+[node name="ChargedSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("10")
+volume_db = -5.0

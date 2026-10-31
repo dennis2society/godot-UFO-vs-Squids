@@ -1,0 +1,41 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://levels/world.tscn" id="1"]
+[ext_resource type="Script" path="res://levels/arena_terrain.gd" id="2"]
+[ext_resource type="Script" path="res://levels/arena_walls.gd" id="3"]
+[ext_resource type="Script" path="res://levels/boss_fight.gd" id="4"]
+[ext_resource type="PackedScene" path="res://enemies/boss.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://pickups/health_pack.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://pickups/shield_pickup.tscn" id="7"]
+
+[node name="Arena" instance=ExtResource("1")]
+
+[node name="Terrain" parent="."]
+script = ExtResource("2")
+cells = 510
+mountain_height = 28.0
+mountain_frequency = 0.008
+clear_radius = 90.0
+snow_height = 60.0
+
+[node name="Ufo" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 78)
+bounds = 250.0
+max_altitude = 120.0
+
+[node name="Walls" type="StaticBody3D" parent="."]
+script = ExtResource("3")
+
+[node name="Blocks" type="MultiMeshInstance3D" parent="Walls"]
+
+[node name="BossFight" type="Node3D" parent="." node_paths=PackedStringArray("terrain", "walls", "player", "hud", "menu")]
+script = ExtResource("4")
+boss_scene = ExtResource("5")
+health_pack_scene = ExtResource("6")
+shield_scene = ExtResource("7")
+terrain = NodePath("../Terrain")
+walls = NodePath("../Walls")
+player = NodePath("../Ufo")
+hud = NodePath("../Hud")
+menu = NodePath("../Menu")
+next_level = "res://levels/swamp.tscn"

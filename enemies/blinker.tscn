@@ -1,0 +1,168 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://enemies/blinker.gd" id="1"]
+[ext_resource type="AudioStream" path="res://sounds/explosion.wav" id="2"]
+[ext_resource type="AudioStream" path="res://sounds/blink.wav" id="3"]
+[ext_resource type="PackedScene" path="res://enemies/enemy_missile.tscn" id="missile"]
+
+[sub_resource type="CapsuleShape3D" id="shape"]
+radius = 0.75
+height = 2.1
+
+[sub_resource type="StandardMaterial3D" id="crystal"]
+albedo_color = Color(0.1, 0.8, 0.75, 1)
+metallic = 0.6
+roughness = 0.2
+emission_enabled = true
+emission = Color(0.05, 0.7, 0.65, 1)
+emission_energy_multiplier = 0.7
+
+[sub_resource type="SphereMesh" id="crystal_mesh"]
+material = SubResource("crystal")
+radius = 0.75
+height = 2.1
+radial_segments = 4
+rings = 2
+
+[sub_resource type="StandardMaterial3D" id="ring_material"]
+shading_mode = 0
+albedo_color = Color(0.3, 1, 0.9, 1)
+
+[sub_resource type="TorusMesh" id="ring_mesh"]
+material = SubResource("ring_material")
+inner_radius = 1.2
+outer_radius = 1.32
+rings = 40
+ring_segments = 8
+
+[sub_resource type="StandardMaterial3D" id="white"]
+albedo_color = Color(1, 1, 1, 1)
+
+[sub_resource type="SphereMesh" id="eye_mesh"]
+material = SubResource("white")
+radius = 0.2
+height = 0.4
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="dark"]
+albedo_color = Color(0.5, 0.02, 0.1, 1)
+
+[sub_resource type="SphereMesh" id="pupil_mesh"]
+material = SubResource("dark")
+radius = 0.11
+height = 0.22
+radial_segments = 12
+rings = 6
+
+[sub_resource type="StandardMaterial3D" id="health_material"]
+shading_mode = 0
+albedo_color = Color(0.3, 1, 0.9, 1)
+billboard_mode = 1
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="health_mesh"]
+material = SubResource("health_material")
+size = Vector2(1.6, 0.12)
+
+[sub_resource type="Gradient" id="flash_gradient"]
+offsets = PackedFloat32Array(0, 0.4, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.3, 1, 0.9, 0.7, 0.1, 0.8, 0.8, 0)
+
+[sub_resource type="GradientTexture2D" id="flash_texture"]
+gradient = SubResource("flash_gradient")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="flash_material"]
+transparency = 1
+shading_mode = 0
+albedo_texture = SubResource("flash_texture")
+billboard_mode = 1
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="flash_mesh"]
+material = SubResource("flash_material")
+size = Vector2(2, 2)
+
+[sub_resource type="SphereMesh" id="burst_mesh"]
+material = SubResource("crystal")
+radius = 0.12
+height = 0.24
+radial_segments = 4
+rings = 2
+
+[node name="Blinker" type="Area3D"]
+script = ExtResource("1")
+missile_scene = ExtResource("missile")
+tentacle_count = 0
+eye_hit_radius = 0.45
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("shape")
+
+[node name="Body" type="Node3D" parent="."]
+
+[node name="Crystal" type="MeshInstance3D" parent="Body"]
+mesh = SubResource("crystal_mesh")
+
+[node name="RingA" type="MeshInstance3D" parent="Body"]
+mesh = SubResource("ring_mesh")
+
+[node name="RingB" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0)
+mesh = SubResource("ring_mesh")
+
+[node name="EyeLeft" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.52)
+mesh = SubResource("eye_mesh")
+
+[node name="PupilLeft" type="MeshInstance3D" parent="Body/EyeLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.13)
+mesh = SubResource("pupil_mesh")
+
+[node name="EyeRight" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0.52)
+mesh = SubResource("eye_mesh")
+
+[node name="PupilRight" type="MeshInstance3D" parent="Body/EyeRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.13)
+mesh = SubResource("pupil_mesh")
+
+[node name="HealthBar" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+visible = false
+cast_shadow = 0
+mesh = SubResource("health_mesh")
+
+[node name="Flash" type="MeshInstance3D" parent="."]
+visible = false
+cast_shadow = 0
+mesh = SubResource("flash_mesh")
+
+[node name="Burst" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 40
+lifetime = 0.7
+one_shot = true
+explosiveness = 1.0
+mesh = SubResource("burst_mesh")
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, -6, 0)
+initial_velocity_min = 4.0
+initial_velocity_max = 10.0
+
+[node name="ExplosionSound" type="AudioStreamPlayer3D" parent="."]
+process_mode = 3
+stream = ExtResource("2")
+unit_size = 40.0
+max_distance = 400.0
+
+[node name="BlinkSound" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("3")
+unit_size = 40.0
+max_distance = 400.0

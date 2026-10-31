@@ -1,0 +1,185 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://enemies/boss.gd" id="1"]
+[ext_resource type="PackedScene" path="res://enemies/boss_bolt.tscn" id="2"]
+[ext_resource type="AudioStream" path="res://sounds/explosion.wav" id="3"]
+[ext_resource type="AudioStream" path="res://sounds/charged.wav" id="4"]
+
+[sub_resource type="SphereShape3D" id="shape"]
+radius = 5.5
+
+[sub_resource type="StandardMaterial3D" id="carapace"]
+albedo_color = Color(0.16, 0.1, 0.22, 1)
+metallic = 0.8
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="brain"]
+albedo_color = Color(0.8, 0.3, 0.45, 1)
+roughness = 0.5
+emission_enabled = true
+emission = Color(0.7, 0.1, 0.35, 1)
+emission_energy_multiplier = 0.8
+
+[sub_resource type="StandardMaterial3D" id="arm"]
+albedo_color = Color(0.3, 0.12, 0.35, 1)
+metallic = 0.4
+roughness = 0.45
+
+[sub_resource type="StandardMaterial3D" id="energy"]
+shading_mode = 0
+albedo_color = Color(1, 0.35, 0.9, 1)
+
+[sub_resource type="StandardMaterial3D" id="eye"]
+albedo_color = Color(1, 0.75, 0.2, 1)
+emission_enabled = true
+emission = Color(1, 0.65, 0.1, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="StandardMaterial3D" id="black"]
+albedo_color = Color(0.02, 0.02, 0.03, 1)
+
+[sub_resource type="SphereMesh" id="carapace_mesh"]
+material = SubResource("carapace")
+radius = 5.0
+height = 8.0
+radial_segments = 48
+rings = 24
+
+[sub_resource type="SphereMesh" id="brain_mesh"]
+material = SubResource("brain")
+radius = 3.9
+height = 5.4
+radial_segments = 32
+rings = 16
+
+[sub_resource type="CylinderMesh" id="spike_mesh"]
+material = SubResource("carapace")
+top_radius = 0.0
+bottom_radius = 0.75
+height = 4.5
+radial_segments = 12
+rings = 1
+
+[sub_resource type="SphereMesh" id="eye_mesh"]
+material = SubResource("eye")
+radius = 1.3
+height = 2.6
+radial_segments = 24
+rings = 12
+
+[sub_resource type="BoxMesh" id="pupil_mesh"]
+material = SubResource("black")
+size = Vector3(0.28, 1.7, 0.3)
+
+[sub_resource type="TorusMesh" id="ring_mesh"]
+material = SubResource("energy")
+inner_radius = 6.6
+outer_radius = 7.0
+rings = 64
+ring_segments = 12
+
+[sub_resource type="SphereMesh" id="core_mesh"]
+material = SubResource("energy")
+radius = 1.3
+height = 2.6
+
+[sub_resource type="QuadMesh" id="health_mesh"]
+size = Vector2(1, 1)
+
+[sub_resource type="SphereMesh" id="burst_mesh"]
+material = SubResource("energy")
+radius = 0.6
+height = 1.2
+
+[node name="Boss" type="Area3D"]
+script = ExtResource("1")
+shot_scene = ExtResource("2")
+eye_hit_radius = 1.6
+arm_material = SubResource("arm")
+eye_material = SubResource("eye")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("shape")
+
+[node name="Body" type="Node3D" parent="."]
+
+[node name="Carapace" type="MeshInstance3D" parent="Body"]
+mesh = SubResource("carapace_mesh")
+
+[node name="Brain" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -0.6)
+mesh = SubResource("brain_mesh")
+
+[node name="SpikeA" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.866, 0.5, 0, -0.5, 0.866, 0, 0, 0, 1, -3.8, 2.6, 2)
+mesh = SubResource("spike_mesh")
+
+[node name="SpikeB" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.866, -0.5, 0, 0.5, 0.866, 0, 0, 0, 1, 3.8, 2.6, 2)
+mesh = SubResource("spike_mesh")
+
+[node name="SpikeC" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.866, 0.5, 0, -0.5, 0.866, 0, 0, 0, 1, -4.4, 1, -1.2)
+mesh = SubResource("spike_mesh")
+
+[node name="SpikeD" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.866, -0.5, 0, 0.5, 0.866, 0, 0, 0, 1, 4.4, 1, -1.2)
+mesh = SubResource("spike_mesh")
+
+[node name="EyeLeft" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9, 0.1, 4)
+mesh = SubResource("eye_mesh")
+
+[node name="PupilLeft" type="MeshInstance3D" parent="Body/EyeLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.15)
+mesh = SubResource("pupil_mesh")
+
+[node name="EyeRight" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.1, 4)
+mesh = SubResource("eye_mesh")
+
+[node name="PupilRight" type="MeshInstance3D" parent="Body/EyeRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.15)
+mesh = SubResource("pupil_mesh")
+
+[node name="RingA" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 0.94, -0.34, 0, 0.34, 0.94, 0, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ring_mesh")
+
+[node name="RingB" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.94, -0.34, 0, 0.34, 0.94, 0, 0, 0, 1, 0, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ring_mesh")
+
+[node name="Cannon" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.6, 3.4)
+cast_shadow = 0
+mesh = SubResource("core_mesh")
+
+[node name="HealthBar" type="MeshInstance3D" parent="."]
+visible = false
+cast_shadow = 0
+mesh = SubResource("health_mesh")
+
+[node name="Burst" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 120
+lifetime = 2.0
+one_shot = true
+explosiveness = 1.0
+mesh = SubResource("burst_mesh")
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, -6, 0)
+initial_velocity_min = 8.0
+initial_velocity_max = 30.0
+
+[node name="ExplosionSound" type="AudioStreamPlayer3D" parent="."]
+process_mode = 3
+stream = ExtResource("3")
+unit_size = 80.0
+
+[node name="ChargeSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4")
+pitch_scale = 0.5

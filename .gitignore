@@ -1,0 +1,18 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Exported builds
+/d2sUfo.exe
+/d2sUfo.x86_64
+/d2sUfo.pck
+/build.zip
+*.console.exe
+*.console.x86_64
+
+# Claude Code
+/.claude/
+
+# Unused local music
+/sounds/music2.ogg
+/sounds/music2.ogg.import

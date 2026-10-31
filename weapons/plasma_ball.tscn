@@ -1,0 +1,106 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://weapons/plasma_ball.gd" id="1"]
+[ext_resource type="PackedScene" path="res://weapons/explosion.tscn" id="2"]
+
+[sub_resource type="SphereShape3D" id="shape"]
+radius = 1.0
+
+[sub_resource type="SphereMesh" id="core_mesh"]
+radius = 0.55
+height = 1.1
+radial_segments = 24
+rings = 12
+
+[sub_resource type="StandardMaterial3D" id="core"]
+shading_mode = 0
+albedo_color = Color(0.8, 1, 1, 1)
+
+[sub_resource type="Gradient" id="soft_gradient"]
+offsets = PackedFloat32Array(0, 0.35, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.5, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="soft_texture"]
+gradient = SubResource("soft_gradient")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="glow_material"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.05, 0.4, 1, 0.95)
+albedo_texture = SubResource("soft_texture")
+billboard_mode = 1
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="glow_mesh"]
+material = SubResource("glow_material")
+size = Vector2(3.6, 3.6)
+
+[sub_resource type="TorusMesh" id="ring_mesh"]
+inner_radius = 0.95
+outer_radius = 1.08
+rings = 40
+ring_segments = 8
+
+[sub_resource type="StandardMaterial3D" id="ring_material"]
+shading_mode = 0
+albedo_color = Color(0.1, 0.75, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="trail_material"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = SubResource("soft_texture")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+
+[sub_resource type="QuadMesh" id="trail_mesh"]
+material = SubResource("trail_material")
+size = Vector2(1.6, 1.6)
+
+[sub_resource type="Gradient" id="trail_gradient"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.2, 0.75, 1, 0.8, 0.05, 0.15, 0.9, 0)
+
+[node name="PlasmaBall" type="Area3D"]
+monitoring = false
+script = ExtResource("1")
+explosion_scene = ExtResource("2")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("shape")
+
+[node name="Glow" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("glow_mesh")
+
+[node name="Core" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("core_mesh")
+surface_material_override/0 = SubResource("core")
+
+[node name="Ring" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ring_mesh")
+surface_material_override/0 = SubResource("ring_material")
+
+[node name="Trail" type="CPUParticles3D" parent="."]
+amount = 60
+lifetime = 0.8
+mesh = SubResource("trail_mesh")
+gravity = Vector3(0, 0, 0)
+scale_amount_min = 0.7
+scale_amount_max = 1.4
+color_ramp = SubResource("trail_gradient")
+
+[node name="Light" type="OmniLight3D" parent="."]
+light_color = Color(0.3, 0.7, 1, 1)
+light_energy = 3.0
+omni_range = 14.0

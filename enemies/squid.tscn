@@ -1,0 +1,147 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://enemies/squid.gd" id="1"]
+[ext_resource type="AudioStream" path="res://sounds/explosion.wav" id="2"]
+[ext_resource type="PackedScene" path="res://enemies/enemy_bolt.tscn" id="shot"]
+
+[sub_resource type="StandardMaterial3D" id="gold"]
+albedo_color = Color(1, 0.75, 0.1, 1)
+metallic = 0.7
+roughness = 0.3
+emission_enabled = true
+emission = Color(1, 0.6, 0.05, 1)
+emission_energy_multiplier = 0.6
+
+[sub_resource type="CapsuleShape3D" id="shape"]
+radius = 0.6
+height = 1.9
+
+[sub_resource type="StandardMaterial3D" id="violet"]
+albedo_color = Color(0.55, 0.2, 0.9, 1)
+roughness = 0.4
+emission_enabled = true
+emission = Color(0.35, 0.1, 0.6, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="SphereMesh" id="mantle_mesh"]
+material = SubResource("violet")
+radius = 0.5
+height = 1.5
+radial_segments = 24
+rings = 12
+
+[sub_resource type="CapsuleMesh" id="fin_mesh"]
+material = SubResource("violet")
+radius = 0.14
+height = 0.9
+radial_segments = 12
+rings = 4
+
+[sub_resource type="CapsuleMesh" id="tentacle_mesh"]
+material = SubResource("violet")
+radius = 0.06
+height = 1.1
+radial_segments = 8
+rings = 3
+
+[sub_resource type="StandardMaterial3D" id="white"]
+albedo_color = Color(1, 1, 1, 1)
+
+[sub_resource type="SphereMesh" id="eye_mesh"]
+material = SubResource("white")
+radius = 0.22
+height = 0.44
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="black"]
+albedo_color = Color(0.02, 0.02, 0.03, 1)
+
+[sub_resource type="SphereMesh" id="pupil_mesh"]
+material = SubResource("black")
+radius = 0.12
+height = 0.24
+radial_segments = 12
+rings = 6
+
+[sub_resource type="SphereMesh" id="burst_mesh"]
+material = SubResource("violet")
+radius = 0.1
+height = 0.2
+radial_segments = 8
+rings = 4
+
+[sub_resource type="StandardMaterial3D" id="health_material"]
+shading_mode = 0
+albedo_color = Color(1, 0.2, 0.2, 1)
+billboard_mode = 1
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="health_mesh"]
+material = SubResource("health_material")
+size = Vector2(1.4, 0.12)
+
+[node name="Squid" type="Area3D"]
+script = ExtResource("1")
+shot_scene = ExtResource("shot")
+tentacle_mesh = SubResource("tentacle_mesh")
+bonus_material = SubResource("gold")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+shape = SubResource("shape")
+
+[node name="Body" type="Node3D" parent="."]
+
+[node name="Mantle" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+mesh = SubResource("mantle_mesh")
+
+[node name="FinLeft" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.5, 0.866, 0, -0.866, 0.5, 0, 0, 0, 0.35, -0.5, 0.65, 0)
+mesh = SubResource("fin_mesh")
+
+[node name="FinRight" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.5, -0.866, 0, 0.866, 0.5, 0, 0, 0, 0.35, 0.5, 0.65, 0)
+mesh = SubResource("fin_mesh")
+
+[node name="EyeLeft" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.27, -0.05, 0.36)
+mesh = SubResource("eye_mesh")
+
+[node name="PupilLeft" type="MeshInstance3D" parent="Body/EyeLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.14)
+mesh = SubResource("pupil_mesh")
+
+[node name="EyeRight" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27, -0.05, 0.36)
+mesh = SubResource("eye_mesh")
+
+[node name="PupilRight" type="MeshInstance3D" parent="Body/EyeRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.14)
+mesh = SubResource("pupil_mesh")
+
+[node name="HealthBar" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0)
+visible = false
+cast_shadow = 0
+mesh = SubResource("health_mesh")
+
+[node name="Burst" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 30
+lifetime = 0.7
+one_shot = true
+explosiveness = 1.0
+mesh = SubResource("burst_mesh")
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, -6, 0)
+initial_velocity_min = 3.0
+initial_velocity_max = 8.0
+
+[node name="ExplosionSound" type="AudioStreamPlayer3D" parent="."]
+process_mode = 3
+stream = ExtResource("2")
+unit_size = 40.0
+max_distance = 400.0

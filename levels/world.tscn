@@ -1,0 +1,279 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://levels/terrain.gd" id="1"]
+[ext_resource type="Shader" path="res://levels/lawn.gdshader" id="2"]
+[ext_resource type="PackedScene" path="res://player/ufo.tscn" id="3"]
+[ext_resource type="Script" path="res://player/chase_camera.gd" id="4"]
+[ext_resource type="Script" path="res://ui/hud.gd" id="7"]
+[ext_resource type="Script" path="res://ui/crosshair.gd" id="8"]
+[ext_resource type="PackedScene" path="res://ui/menu.tscn" id="9"]
+[ext_resource type="Script" path="res://ui/stats_overlay.gd" id="10"]
+[ext_resource type="Script" path="res://ui/minimap.gd" id="11"]
+[ext_resource type="Script" path="res://ui/compass.gd" id="12"]
+
+[sub_resource type="StyleBoxFlat" id="life_background"]
+bg_color = Color(0, 0, 0, 0.5)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="life_fill"]
+bg_color = Color(0.3, 0.9, 0.3, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="upgrades_background"]
+bg_color = Color(0, 0, 0, 0.5)
+content_margin_left = 8.0
+content_margin_top = 5.0
+content_margin_right = 8.0
+content_margin_bottom = 5.0
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="boss_fill"]
+bg_color = Color(0.85, 0.12, 0.3, 1)
+
+[sub_resource type="StyleBoxFlat" id="shield_fill"]
+bg_color = Color(0.25, 0.6, 1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_material"]
+sky_top_color = Color(0.16, 0.38, 0.72, 1)
+sky_horizon_color = Color(0.68, 0.8, 0.9, 1)
+ground_bottom_color = Color(0.68, 0.8, 0.9, 1)
+ground_horizon_color = Color(0.68, 0.8, 0.9, 1)
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_material")
+
+[sub_resource type="Environment" id="environment"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 3
+reflected_light_source = 2
+tonemap_mode = 3
+fog_enabled = true
+fog_light_color = Color(0.68, 0.8, 0.9, 1)
+fog_density = 0.002
+fog_sky_affect = 0.0
+
+[sub_resource type="FastNoiseLite" id="lawn_noise"]
+frequency = 0.05
+fractal_octaves = 3
+
+[sub_resource type="NoiseTexture2D" id="lawn_texture"]
+width = 512
+height = 512
+seamless = true
+generate_mipmaps = true
+normalize = true
+noise = SubResource("lawn_noise")
+
+[sub_resource type="ShaderMaterial" id="lawn_material"]
+shader = ExtResource("2")
+shader_parameter/noise_texture = SubResource("lawn_texture")
+
+[node name="World" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("environment")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.354, 0.354, 0, 0.707, 0.707, -0.5, -0.612, 0.612, 0, 50, 0)
+shadow_enabled = true
+directional_shadow_max_distance = 200.0
+
+[node name="Terrain" type="StaticBody3D" parent="."]
+script = ExtResource("1")
+
+[node name="Mesh" type="MeshInstance3D" parent="Terrain"]
+material_override = SubResource("lawn_material")
+
+[node name="Collision" type="CollisionShape3D" parent="Terrain"]
+
+[node name="Ufo" parent="." instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 0)
+
+[node name="Camera" type="Camera3D" parent="." node_paths=PackedStringArray("target")]
+far = 1000.0
+script = ExtResource("4")
+target = NodePath("../Ufo")
+
+[node name="Hud" type="CanvasLayer" parent="." node_paths=PackedStringArray("player")]
+script = ExtResource("7")
+player = NodePath("../Ufo")
+
+[node name="Crosshair" type="Control" parent="Hud"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+mouse_filter = 2
+script = ExtResource("8")
+
+[node name="Objective" type="Label" parent="Hud"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 16.0
+offset_bottom = 90.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="Hud"]
+modulate = Color(1, 1, 1, 0.8)
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 48.0
+offset_bottom = 70.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+
+[node name="Toast" type="Label" parent="Hud"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 120.0
+offset_bottom = 170.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+
+[node name="UpgradesPanel" type="PanelContainer" parent="Hud"]
+visible = false
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = -16.0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("upgrades_background")
+
+[node name="Upgrades" type="RichTextLabel" parent="Hud/UpgradesPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 11
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+
+[node name="Minimap" type="Control" parent="Hud"]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -176.0
+offset_top = -176.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("11")
+
+[node name="Compass" type="Control" parent="Hud"]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -170.0
+offset_top = -46.0
+offset_right = 170.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("12")
+
+[node name="Waypoint" type="Label" parent="Hud"]
+visible = false
+offset_right = 90.0
+offset_bottom = 50.0
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="LifeBar" type="ProgressBar" parent="Hud"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 280.0
+offset_bottom = 44.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("life_background")
+theme_override_styles/fill = SubResource("life_fill")
+value = 100.0
+show_percentage = false
+
+[node name="ShieldBar" type="ProgressBar" parent="Hud"]
+visible = false
+offset_left = 20.0
+offset_top = 48.0
+offset_right = 280.0
+offset_bottom = 60.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("life_background")
+theme_override_styles/fill = SubResource("shield_fill")
+show_percentage = false
+
+[node name="BossBar" type="ProgressBar" parent="Hud"]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 76.0
+offset_right = 300.0
+offset_bottom = 96.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("life_background")
+theme_override_styles/fill = SubResource("boss_fill")
+show_percentage = false
+
+[node name="Stats" type="Label" parent="Hud"]
+process_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -300.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 120.0
+grow_horizontal = 0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 2
+script = ExtResource("10")
+
+[node name="Menu" parent="." node_paths=PackedStringArray("player", "stats") instance=ExtResource("9")]
+player = NodePath("../Ufo")
+stats = NodePath("../Hud/Stats")

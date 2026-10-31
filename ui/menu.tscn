@@ -1,0 +1,143 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/menu.gd" id="1"]
+[ext_resource type="Script" path="res://ui/skill_tree.gd" id="2"]
+
+[node name="Menu" type="CanvasLayer"]
+process_mode = 3
+layer = 10
+script = ExtResource("1")
+
+[node name="Dim" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.5)
+
+[node name="Center" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Items" type="VBoxContainer" parent="Center"]
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Center/Items"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Paused"
+horizontal_alignment = 1
+
+[node name="Rewards" type="RichTextLabel" parent="Center/Items"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+fit_content = true
+
+[node name="Continue" type="Button" parent="Center/Items"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Continue"
+
+[node name="Resume" type="Button" parent="Center/Items"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Resume"
+
+[node name="SkillTree" type="Button" parent="Center/Items"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Skill Tree"
+
+[node name="Restart" type="Button" parent="Center/Items"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Restart"
+
+[node name="StatsToggle" type="CheckButton" parent="Center/Items"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Show FPS / resolution (F3)"
+
+[node name="MusicToggle" type="CheckButton" parent="Center/Items"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Music"
+
+[node name="HintsToggle" type="CheckButton" parent="Center/Items"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Usage hints"
+
+[node name="MainMenu" type="Button" parent="Center/Items"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Main Menu"
+
+[node name="Quit" type="Button" parent="Center/Items"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Quit"
+
+[node name="SkillTree" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("2")
+
+[node name="Backdrop" type="ColorRect" parent="SkillTree"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.03, 0.04, 0.08, 0.9)
+
+[node name="Center" type="CenterContainer" parent="SkillTree"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Items" type="VBoxContainer" parent="SkillTree/Center"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Heading" type="Label" parent="SkillTree/Center/Items"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Skill Tree"
+horizontal_alignment = 1
+
+[node name="Points" type="Label" parent="SkillTree/Center/Items"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.82, 0.2, 1)
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+
+[node name="Branches" type="HBoxContainer" parent="SkillTree/Center/Items"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Details" type="Label" parent="SkillTree/Center/Items"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Hover a skill for details"
+horizontal_alignment = 1
+
+[node name="Synergies" type="RichTextLabel" parent="SkillTree/Center/Items"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 12
+theme_override_font_sizes/italics_font_size = 12
+bbcode_enabled = true
+fit_content = true
+
+[node name="Back" type="Button" parent="SkillTree/Center/Items"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 16
+text = "Back"
