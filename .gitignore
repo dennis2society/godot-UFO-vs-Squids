@@ -3,9 +3,9 @@
 /android/
 
 # Exported builds
-/d2sUfo.exe
-/d2sUfo.x86_64
-/d2sUfo.pck
+/UFO_vs_Squids.exe
+/UFO_vs_Squids.x86_64
+/UFO_vs_Squids.pck
 /build.zip
 *.console.exe
 *.console.x86_64
