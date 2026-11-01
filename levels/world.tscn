@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://ui/stats_overlay.gd" id="10"]
 [ext_resource type="Script" path="res://ui/minimap.gd" id="11"]
 [ext_resource type="Script" path="res://ui/compass.gd" id="12"]
+[ext_resource type="Shader" path="res://player/outline.gdshader" id="outline_shader"]
 
 [sub_resource type="StyleBoxFlat" id="life_background"]
 bg_color = Color(0, 0, 0, 0.5)
@@ -94,6 +95,13 @@ generate_mipmaps = true
 normalize = true
 noise = SubResource("lawn_noise")
 
+[sub_resource type="ShaderMaterial" id="outline_material"]
+render_priority = -100
+shader = ExtResource("outline_shader")
+
+[sub_resource type="QuadMesh" id="outline_mesh"]
+material = SubResource("outline_material")
+
 [sub_resource type="ShaderMaterial" id="lawn_material"]
 shader = ExtResource("2")
 shader_parameter/noise_texture = SubResource("lawn_texture")
@@ -123,6 +131,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 0)
 far = 1000.0
 script = ExtResource("4")
 target = NodePath("../Ufo")
+
+[node name="Outline" type="MeshInstance3D" parent="Camera"]
+cast_shadow = 0
+extra_cull_margin = 16384.0
+mesh = SubResource("outline_mesh")
 
 [node name="Hud" type="CanvasLayer" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("7")
