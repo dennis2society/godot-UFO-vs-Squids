@@ -2,12 +2,14 @@ extends Node
 ## Player preferences. They have their own file, so a new game doesn't reset them.
 
 signal hints_changed(value: bool)
+signal outlines_changed(value: bool)
 
 const PATH := "user://settings.cfg"
 
 var music := true
 var hints := true
 var vsync := true
+var outlines := true
 var music_volume := 1.0 ## From 0 to 1.
 var sfx_volume := 1.0
 
@@ -18,6 +20,7 @@ func _ready() -> void:
 		music = file.get_value("audio", "music", true)
 		hints = file.get_value("ui", "hints", true)
 		vsync = file.get_value("video", "vsync", true)
+		outlines = file.get_value("video", "outlines", true)
 		music_volume = file.get_value("audio", "music_volume", 1.0)
 		sfx_volume = file.get_value("audio", "sfx_volume", 1.0)
 	_apply_vsync()
@@ -54,6 +57,12 @@ func set_hints(value: bool) -> void:
 	hints_changed.emit(value)
 
 
+func set_outlines(value: bool) -> void:
+	outlines = value
+	_save()
+	outlines_changed.emit(value)
+
+
 func set_vsync(value: bool) -> void:
 	vsync = value
 	_apply_vsync()
@@ -73,4 +82,5 @@ func _save() -> void:
 	file.set_value("audio", "sfx_volume", sfx_volume)
 	file.set_value("ui", "hints", hints)
 	file.set_value("video", "vsync", vsync)
+	file.set_value("video", "outlines", outlines)
 	file.save(PATH)

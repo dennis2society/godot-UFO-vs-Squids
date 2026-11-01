@@ -27,6 +27,7 @@ var _tree_from_game := false ## Leaving the tree resumes play instead of showing
 @onready var music_slider: HSlider = $Center/Items/MusicVolume/Slider
 @onready var sfx_slider: HSlider = $Center/Items/SfxVolume/Slider
 @onready var hints_toggle: CheckButton = $Center/Items/HintsToggle
+@onready var outlines_toggle: CheckButton = $Center/Items/OutlinesToggle
 @onready var main_menu_button: Button = $Center/Items/MainMenu
 @onready var quit_button: Button = $Center/Items/Quit
 
@@ -51,6 +52,8 @@ func _ready() -> void:
 	sfx_slider.drag_ended.connect(_preview_effects)
 	hints_toggle.button_pressed = Settings.hints
 	hints_toggle.toggled.connect(Settings.set_hints)
+	outlines_toggle.button_pressed = Settings.outlines
+	outlines_toggle.toggled.connect(Settings.set_outlines)
 	stats_toggle.button_pressed = stats.enabled
 	stats_toggle.toggled.connect(stats.set_enabled)
 	stats.enabled_changed.connect(stats_toggle.set_pressed_no_signal)
@@ -131,6 +134,7 @@ func _open(heading: String) -> void:
 	music_volume.visible = not _finished
 	sfx_volume.visible = not _finished
 	hints_toggle.visible = not _finished
+	outlines_toggle.visible = not _finished
 	continue_button.visible = _next_scene != ""
 	restart_button.visible = true
 	show()

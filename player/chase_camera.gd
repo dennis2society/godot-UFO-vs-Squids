@@ -6,8 +6,12 @@ extends Camera3D
 @export var height := 1.2
 @export var ground_clearance := 0.5
 
+@onready var outline: MeshInstance3D = $Outline
+
 
 func _ready() -> void:
+	Settings.outlines_changed.connect(outline.set_visible)
+	outline.visible = Settings.outlines
 	global_basis = target.look_basis()
 	global_position = _desired_position()
 
